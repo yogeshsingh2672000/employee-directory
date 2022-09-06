@@ -1,0 +1,25 @@
+{
+  "name": "employee-directory",
+  "version": "1.0.0",
+  "description": "This my first personal project to learn node, this is a simple CRUD based application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yogeshsingh2672000/employee-directory.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yogeshsingh2672000/employee-directory/issues"
+  },
+  "homepage": "https://github.com/yogeshsingh2672000/employee-directory#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
