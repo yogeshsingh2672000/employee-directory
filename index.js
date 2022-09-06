@@ -14,7 +14,7 @@ app.get("/", (req, res) => {
 });
 
 // API routes
-// app.use("/api/auth", require("./routes/auth"));
+app.use("/api/auth", require("./routes/auth"));
 // app.use("/api/employee", require("./routes/employee"));
 
 app.listen(port, () => {
