@@ -1,7 +1,14 @@
 const express = require("express");
+const connectToMongo = require("./database/db");
+
+// connecting to database
+connectToMongo();
+
+// initializing the app
 const app = express();
 const port = 3000;
 
+// default route
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
