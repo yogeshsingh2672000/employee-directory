@@ -6,6 +6,10 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+// API routes
+// app.use("/api/auth", require("./routes/auth"));
+// app.use("/api/employee", require("./routes/employee"));
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
