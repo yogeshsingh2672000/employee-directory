@@ -4,6 +4,7 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const fetchuser = require("../middleware/fetchuser");
 
 // Route 1: Creating a new user POST: /createuser
 router.post(
@@ -41,7 +42,6 @@ router.post(
       const data = {
         user: {
           id: user.id,
-          email: user.email,
         },
       };
 
@@ -84,7 +84,6 @@ router.post(
       const data = {
         user: {
           id: user.id,
-          email: user.email,
         },
       };
       const authToken = jwt.sign(data, "" + process.env.JWT_SECRET);
@@ -93,6 +92,57 @@ router.post(
     } catch (error) {
       return res.status(500).send("Internal server Error");
     }
+  }
+);
+
+// Route 2: Login the existing user POST: /login
+router.put(
+  "/resetpassword",
+  [
+    body("currentPass", "this cannot be empty").exists(),
+    body("newPass", "this cannot be empty").exists(),
+    body("confirmPass", "this cannot be empty").exists(),
+  ],
+  fetchuser,
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors) {
+      return res
+        .status(400)
+        .json({ error: "please enter the correct Credentials" });
+    }
+    const { currentPass, newPass, confirmPass } = req.body;
+    try {
+      if (currentPass == confirmPass) {
+        return res
+          .status(400)
+          .json({ errors: "New password cannot be the same" });
+      } else if (newPass != confirmPass) {
+        return res
+          .status(400)
+          .json({ errors: "please give same password in New and Confirm" });
+      }
+      const user = await User.findById(req.user.id);
+      const comparePass = await bcrypt.compare(currentPass, user.password);
+
+      if (!comparePass) {
+        return res.status(400).json({ error: "Current password in wrong" });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const newPassword = await bcrypt.hash(newPass, salt);
+
+      const updatedUser = await User.findByIdAndUpdate(
+        user.id,
+        { password: newPassword },
+        { new: true }
+      );
+      res.json({ success: "password successfully changed" });
+    } catch (error) {
+      res.status(500).send("Internal server Error");
+    }
+
+    // let user = await User.findOne({});
   }
 );
 
