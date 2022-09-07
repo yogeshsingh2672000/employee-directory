@@ -17,15 +17,13 @@ router.post(
   ],
   async (req, res) => {
     const errors = validationResult(req);
-    console.log(req.body);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     try {
       let user = await User.findOne({ email: req.body.email });
-
       if (user != null) {
-        res.json({ erros: `User with ${user.email} already exist` });
+        return res.json({ erros: `User with ${user.email} already exist` });
       }
 
       // making secure password
@@ -33,24 +31,67 @@ router.post(
       const securePass = await bcrypt.hash(req.body.password, salt);
 
       // creating new user for DB
-      user = new User({
+      user = await User({
         name: req.body.name,
         email: req.body.email,
         password: securePass,
       });
+      user.save();
 
       const data = {
         user: {
           id: user.id,
+          email: user.email,
         },
       };
 
       // generating auth token
-      const authToken = jwt.sign(data, process.env.JWT_SECRET);
+      // res.json(data);
+      const authToken = jwt.sign(data, "" + process.env.JWT_SECRET);
       res.json({ authToken });
     } catch (error) {
-      console.log(error.message);
       res.status(500).send("Internal server Error");
+    }
+  }
+);
+
+// Route 2: Login the existing user POST: /login
+router.post(
+  "/login",
+  [
+    body("email", "Please enter the valid email").isEmail(),
+    body("password", "Please enter the valid password").exists(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+      const { email, password } = req.body;
+      let user = await User.findOne({ email });
+      if (user == null) {
+        return res.status(400).json({ error: "please use valid credential" });
+      }
+
+      // Comparing Pass
+      const comparePass = await bcrypt.compare(password, user.password); // return true/false
+      if (!comparePass) {
+        return res.status(400).json({ error: "please use valid credential" });
+      }
+
+      // generating authToken
+      const data = {
+        user: {
+          id: user.id,
+          email: user.email,
+        },
+      };
+      const authToken = jwt.sign(data, "" + process.env.JWT_SECRET);
+      // console.log("hello");
+      res.json({ authToken });
+    } catch (error) {
+      return res.status(500).send("Internal server Error");
     }
   }
 );

@@ -1,5 +1,6 @@
 const express = require("express");
 const connectToMongo = require("./database/db");
+const bodyParser = require("body-parser");
 
 // connecting to database
 connectToMongo();
@@ -7,6 +8,9 @@ connectToMongo();
 // initializing the app
 const app = express();
 const port = 3000;
+
+// used to access the payload
+app.use(express.json());
 
 // default route
 app.get("/", (req, res) => {

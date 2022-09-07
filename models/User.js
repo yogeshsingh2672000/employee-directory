@@ -17,7 +17,10 @@ const userSchema = new Schema({
   },
   date: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
+  },
+  date: {
+    type: Number,
   },
 });
 const User = mongoose.model("user", userSchema); // giving the name(user) and its schema of collection in mongoDB
